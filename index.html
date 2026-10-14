@@ -61,6 +61,29 @@
   <main>
     <section class="card">
       <h2>বন্ধুদের সঙ্গে যুক্ত থাকো!</h2>
+<section class="card">
+  <h3>Join Friendsbook / Friendsbook-এ যোগ দাও</h3>
+
+  <input
+    id="email"
+    type="email"
+    placeholder="Email address"
+    style="width:100%;padding:12px;margin-bottom:10px"
+  >
+
+  <input
+    id="password"
+    type="password"
+    placeholder="Password"
+    style="width:100%;padding:12px;margin-bottom:10px"
+  >
+
+  <button id="signupBtn">Sign up / নিবন্ধন</button>
+  <button id="loginBtn">Login / লগইন</button>
+
+  <p id="authMessage" class="muted"></p>
+</section>
+
       <p>Share your thoughts. Connect with friends.</p>
       <button id="langBtn">English</button>
     </section>
@@ -85,8 +108,41 @@
     const feed = document.getElementById("feed");
     const notice = document.getElementById("notice");
     let english = false;
+const supabaseClient = window.supabase.createClient(
+  
+document.getElementById("signupBtn").onclick = async () => {
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+  const message = document.getElementById("authMessage");
 
-    document.getElementById("postBtn").onclick = () => {
+  const { error } = await supabaseClient.auth.signUp({
+    email,
+    password
+  });
+
+  message.textContent = error
+    ? error.message
+    : "Registration submitted! Check your email if confirmation is required.";
+};
+
+document.getElementById("loginBtn").onclick = async () => {
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+  const message = document.getElementById("authMessage");
+
+  const { error } = await supabaseClient.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  message.textContent = error
+    ? error.message
+    : "Login successful!";
+};
+
+  window.FRIENDSBOOK_CONFIG.SUPABASE_URL,
+  window.FRIENDSBOOK_CONFIG.SUPABASE_PUBLISHABLE_KEY
+);document.getElementById("postBtn").onclick = () => {
       const text = input.value.trim();
 
       if (!text) {
