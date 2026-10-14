@@ -109,7 +109,9 @@
     const notice = document.getElementById("notice");
     let english = false;
 const supabaseClient = window.supabase.createClient(
-  
+  window.FRIENDSBOOK_CONFIG.SUPABASE_URL,
+window.FRIENDSBOOK_CONFIG.SUPABASE_PUBLISHABLE_KEY
+);
 document.getElementById("signupBtn").onclick = async () => {
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
