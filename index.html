@@ -1,1 +1,139 @@
 
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#1877f2">
+  <title>Friendsbook — Connect with Friends</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f0f2f5;
+      color: #1c1e21;
+    }
+    header {
+      background: #1877f2;
+      color: white;
+      padding: 18px 16px;
+      font-size: 27px;
+      font-weight: bold;
+    }
+    main {
+      max-width: 620px;
+      margin: 24px auto;
+      padding: 0 14px;
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 18px;
+      box-shadow: 0 1px 4px #00000012;
+    }
+    textarea {
+      width: 100%;
+      min-height: 90px;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 9px;
+      font-size: 16px;
+      resize: vertical;
+    }
+    button {
+      background: #1877f2;
+      color: white;
+      border: 0;
+      border-radius: 8px;
+      padding: 11px 17px;
+      font-size: 15px;
+      cursor: pointer;
+    }
+    .muted { color: #65676b; font-size: 13px; }
+    .post-text { white-space: pre-wrap; overflow-wrap: anywhere; }
+  </style>
+</head>
+<body>
+  <header>Friendsbook</header>
+
+  <main>
+    <section class="card">
+      <h2>বন্ধুদের সঙ্গে যুক্ত থাকো!</h2>
+      <p>Share your thoughts. Connect with friends.</p>
+      <button id="langBtn">English</button>
+    </section>
+
+    <section class="card">
+      <h3 id="writeTitle">তোমার মনের কথা লেখো</h3>
+      <textarea id="postInput"
+        placeholder="কী ভাবছ?"></textarea>
+      <br><br>
+      <button id="postBtn">পোস্ট তৈরি করো</button>
+      <p class="muted" id="notice">
+        এটি Friendsbook-এর প্রাথমিক ডেমো।
+      </p>
+    </section>
+
+    <h2 id="feedTitle">সাম্প্রতিক পোস্ট</h2>
+    <div id="feed"></div>
+  </main>
+
+  <script>
+    const input = document.getElementById("postInput");
+    const feed = document.getElementById("feed");
+    const notice = document.getElementById("notice");
+    let english = false;
+
+    document.getElementById("postBtn").onclick = () => {
+      const text = input.value.trim();
+
+      if (!text) {
+        notice.textContent = english
+          ? "Please write something first."
+          : "আগে কিছু লিখো!";
+        return;
+      }
+
+      const card = document.createElement("section");
+      card.className = "card";
+
+      const content = document.createElement("p");
+      content.className = "post-text";
+      content.textContent = text;
+
+      const time = document.createElement("p");
+      time.className = "muted";
+      time.textContent = new Date().toLocaleString();
+
+      card.append(content, time);
+      feed.prepend(card);
+      input.value = "";
+      notice.textContent = english
+        ? "Demo post added."
+        : "ডেমো পোস্ট যোগ হয়েছে!";
+    };
+
+    document.getElementById("langBtn").onclick = () => {
+      english = !english;
+      document.documentElement.lang = english ? "en" : "bn";
+
+      document.getElementById("langBtn").textContent =
+        english ? "বাংলা" : "English";
+      document.getElementById("writeTitle").textContent =
+        english ? "Write a post" : "তোমার মনের কথা লেখো";
+      document.getElementById("postInput").placeholder =
+        english ? "What's on your mind?" : "কী ভাবছ?";
+      document.getElementById("postBtn").textContent =
+        english ? "Create post" : "পোস্ট তৈরি করো";
+      document.getElementById("feedTitle").textContent =
+        english ? "Recent posts" : "সাম্প্রতিক পোস্ট";
+      notice.textContent = english
+        ? "This is an initial Friendsbook demo."
+        : "এটি Friendsbook-এর প্রাথমিক ডেমো।";
+    };
+  </script>
+</body>
+</html>
+
