@@ -4,8 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#1877f2">
-  <title>Friendsbook — Connect with Friends</title>
+  <title>Friendsbook</title>
   <style>
     * { box-sizing: border-box; }
     body {
@@ -17,7 +16,7 @@
     header {
       background: #1877f2;
       color: white;
-      padding: 18px 16px;
+      padding: 18px;
       font-size: 27px;
       font-weight: bold;
     }
@@ -31,25 +30,24 @@
       border-radius: 12px;
       padding: 18px;
       margin-bottom: 18px;
-      box-shadow: 0 1px 4px #00000012;
     }
-    textarea {
+    input, textarea {
       width: 100%;
-      min-height: 90px;
       padding: 12px;
+      margin: 6px 0 12px;
       border: 1px solid #ddd;
-      border-radius: 9px;
+      border-radius: 8px;
       font-size: 16px;
-      resize: vertical;
     }
+    textarea { min-height: 90px; }
     button {
       background: #1877f2;
       color: white;
       border: 0;
       border-radius: 8px;
       padding: 11px 17px;
+      margin: 4px 2px;
       font-size: 15px;
-      cursor: pointer;
     }
     .muted { color: #65676b; font-size: 13px; }
     .post-text { white-space: pre-wrap; overflow-wrap: anywhere; }
@@ -57,143 +55,106 @@
 </head>
 <body>
   <header>Friendsbook</header>
-
   <main>
     <section class="card">
       <h2>বন্ধুদের সঙ্গে যুক্ত থাকো!</h2>
-<section class="card">
-  <h3>Join Friendsbook / Friendsbook-এ যোগ দাও</h3>
-
-  <input
-    id="email"
-    type="email"
-    placeholder="Email address"
-    style="width:100%;padding:12px;margin-bottom:10px"
-  >
-
-  <input
-    id="password"
-    type="password"
-    placeholder="Password"
-    style="width:100%;padding:12px;margin-bottom:10px"
-  >
-
-  <button id="signupBtn">Sign up / নিবন্ধন</button>
-  <button id="loginBtn">Login / লগইন</button>
-
-  <p id="authMessage" class="muted"></p>
-</section>
-
       <p>Share your thoughts. Connect with friends.</p>
-      <button id="langBtn">English</button>
     </section>
 
     <section class="card">
-      <h3 id="writeTitle">তোমার মনের কথা লেখো</h3>
-      <textarea id="postInput"
-        placeholder="কী ভাবছ?"></textarea>
-      <br><br>
-      <button id="postBtn">পোস্ট তৈরি করো</button>
-      <p class="muted" id="notice">
-        এটি Friendsbook-এর প্রাথমিক ডেমো।
-      </p>
+      <h3>Join Friendsbook / যোগ দাও</h3>
+      <input id="email" type="email" placeholder="Email address">
+      <input id="password" type="password" placeholder="Password">
+      <button id="signupBtn">Sign up / নিবন্ধন</button>
+      <button id="loginBtn">Login / লগইন</button>
+      <p id="authMessage" class="muted"></p>
     </section>
 
-    <h2 id="feedTitle">সাম্প্রতিক পোস্ট</h2>
+    <section class="card">
+      <h3>তোমার মনের কথা লেখো</h3>
+      <textarea id="postInput" placeholder="কী ভাবছ?"></textarea>
+      <button id="postBtn">পোস্ট তৈরি করো</button>
+      <p id="notice" class="muted">Friendsbook ডেমো</p>
+    </section>
+
+    <h2>সাম্প্রতিক পোস্ট</h2>
     <div id="feed"></div>
   </main>
 
+  <script src="config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    const input = document.getElementById("postInput");
-    const feed = document.getElementById("feed");
-    const notice = document.getElementById("notice");
-    let english = false;
-const supabaseClient = window.supabase.createClient(
-  window.FRIENDSBOOK_CONFIG.SUPABASE_URL,
-window.FRIENDSBOOK_CONFIG.SUPABASE_PUBLISHABLE_KEY
-);
-document.getElementById("signupBtn").onclick = async () => {
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value;
-  const message = document.getElementById("authMessage");
+    const message = document.getElementById("authMessage");
 
-  const { error } = await supabaseClient.auth.signUp({
-    email,
-    password
-  });
-
-  message.textContent = error
-    ? error.message
-    : "Registration submitted! Check your email if confirmation is required.";
-};
-
-document.getElementById("loginBtn").onclick = async () => {
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value;
-  const message = document.getElementById("authMessage");
-
-  const { error } = await supabaseClient.auth.signInWithPassword({
-    email,
-    password
-  });
-
-  message.textContent = error
-    ? error.message
-    : "Login successful!";
-};
-
-  window.FRIENDSBOOK_CONFIG.SUPABASE_URL,
-  window.FRIENDSBOOK_CONFIG.SUPABASE_PUBLISHABLE_KEY
-);document.getElementById("postBtn").onclick = () => {
-      const text = input.value.trim();
-
-      if (!text) {
-        notice.textContent = english
-          ? "Please write something first."
-          : "আগে কিছু লিখো!";
-        return;
+    try {
+      if (!window.FRIENDSBOOK_CONFIG ||
+          !window.FRIENDSBOOK_CONFIG.SUPABASE_URL ||
+          !window.FRIENDSBOOK_CONFIG.SUPABASE_PUBLISHABLE_KEY) {
+        throw new Error("Supabase config.js-এ URL বা Publishable Key নেই।");
       }
 
+      if (!window.supabase) {
+        throw new Error("Supabase library লোড হয়নি।");
+      }
+
+      const supabaseClient = window.supabase.createClient(
+        window.FRIENDSBOOK_CONFIG.SUPABASE_URL,
+        window.FRIENDSBOOK_CONFIG.SUPABASE_PUBLISHABLE_KEY
+      );
+
+      document.getElementById("signupBtn").onclick = async () => {
+        message.textContent = "অপেক্ষা করো...";
+        try {
+          const email = document.getElementById("email").value.trim();
+          const password = document.getElementById("password").value;
+          if (!email || !password) {
+            throw new Error("ইমেইল ও পাসওয়ার্ড লেখো।");
+          }
+          const { error } = await supabaseClient.auth.signUp({ email, password });
+          if (error) throw error;
+          message.textContent = "নিবন্ধনের অনুরোধ সফল! ইমেইল যাচাই করো, যদি চাওয়া হয়।";
+        } catch (e) {
+          message.textContent = e.message;
+        }
+      };
+
+      document.getElementById("loginBtn").onclick = async () => {
+        message.textContent = "লগইন হচ্ছে...";
+        try {
+          const email = document.getElementById("email").value.trim();
+          const password = document.getElementById("password").value;
+          if (!email || !password) {
+            throw new Error("ইমেইল ও পাসওয়ার্ড লেখো।");
+          }
+          const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+          if (error) throw error;
+          message.textContent = "Login successful!";
+        } catch (e) {
+          message.textContent = e.message;
+        }
+      };
+    } catch (e) {
+      message.textContent = "সংযোগ সমস্যা: " + e.message;
+    }
+
+    document.getElementById("postBtn").onclick = () => {
+      const input = document.getElementById("postInput");
+      const text = input.value.trim();
+      const notice = document.getElementById("notice");
+      if (!text) {
+        notice.textContent = "আগে কিছু লেখো!";
+        return;
+      }
       const card = document.createElement("section");
       card.className = "card";
-
-      const content = document.createElement("p");
-      content.className = "post-text";
-      content.textContent = text;
-
-      const time = document.createElement("p");
-      time.className = "muted";
-      time.textContent = new Date().toLocaleString();
-
-      card.append(content, time);
-      feed.prepend(card);
+      const p = document.createElement("p");
+      p.className = "post-text";
+      p.textContent = text;
+      card.appendChild(p);
+      document.getElementById("feed").prepend(card);
       input.value = "";
-      notice.textContent = english
-        ? "Demo post added."
-        : "ডেমো পোস্ট যোগ হয়েছে!";
+      notice.textContent = "ডেমো পোস্ট যোগ হয়েছে!";
     };
-
-    document.getElementById("langBtn").onclick = () => {
-      english = !english;
-      document.documentElement.lang = english ? "en" : "bn";
-
-      document.getElementById("langBtn").textContent =
-        english ? "বাংলা" : "English";
-      document.getElementById("writeTitle").textContent =
-        english ? "Write a post" : "তোমার মনের কথা লেখো";
-      document.getElementById("postInput").placeholder =
-        english ? "What's on your mind?" : "কী ভাবছ?";
-      document.getElementById("postBtn").textContent =
-        english ? "Create post" : "পোস্ট তৈরি করো";
-      document.getElementById("feedTitle").textContent =
-        english ? "Recent posts" : "সাম্প্রতিক পোস্ট";
-      notice.textContent = english
-        ? "This is an initial Friendsbook demo."
-        : "এটি Friendsbook-এর প্রাথমিক ডেমো।";
-    };
-    <script src="config.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   </script>
 </body>
 </html>
-
